@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  picture String? @default("https://api.dicebear.com/7.x/thumbs/svg?seed=Simba&backgroundColor=transparent&shapeColor=f88c49,69d2e7,1c799f,0a5b83&size=32")
+  name String
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Family Family?
+  Member Member[]
+}
+
+model Family {
+  id Int @id @default(autoincrement())
+  name String
+  protect Boolean
+  ownerId Int @unique
+  Owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Members Member[]
+  List Product[]
+}
+
+model Member {
+  id Int @id @default(autoincrement())
+  pending Boolean
+  familyId Int
+  Family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  memberId Int
+  Member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Product Product[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  familyId Int
+  List Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  memberId Int
+  Member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
